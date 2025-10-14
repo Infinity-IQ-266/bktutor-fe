@@ -21,7 +21,8 @@ function RouteComponent() {
         password: z.string().min(1).max(64),
     });
 
-    const handleLogin = async () => {
+    const handleLogin = async (e?: React.FormEvent) => {
+        e?.preventDefault();
         const validateResult = AuthRequest.safeParse({
             username: usernameRef.current,
             password: passwordRef.current,
@@ -64,7 +65,10 @@ function RouteComponent() {
             </div>
             <div className="w-full px-5">
                 <div className="flex w-full flex-row">
-                    <div className="my-5 w-full border border-black bg-gray/10 p-3 md:p-5 xl:w-auto xl:px-8">
+                    <form
+                        className="my-5 w-full border border-black bg-gray/10 p-3 md:p-5 xl:w-auto xl:px-8"
+                        onSubmit={handleLogin}
+                    >
                         <p className="text-md mb-2 font-bold text-nowrap text-red md:text-xl xl:text-2xl 2xl:text-3xl">
                             Enter your Username and Password
                         </p>
@@ -91,6 +95,7 @@ function RouteComponent() {
                             <button
                                 className="inline-flex w-full justify-center bg-secondary py-2 hover:cursor-pointer hover:bg-secondary-darken"
                                 onClick={handleLogin}
+                                type="submit"
                             >
                                 <p className="text-lg font-bold text-white">
                                     Login
@@ -103,7 +108,7 @@ function RouteComponent() {
                                 Change password?
                             </Link>
                         </div>
-                    </div>
+                    </form>
                     <div className="my-5 hidden border border-s-0 border-black bg-gray/10 p-3 md:p-5 xl:block xl:w-full xl:px-8">
                         <p className="text-md mb-2 font-bold text-nowrap text-red md:text-xl xl:text-2xl 2xl:text-3xl">
                             Please note
