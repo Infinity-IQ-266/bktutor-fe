@@ -10,7 +10,7 @@ export const LoginButton = ({ className }: LoginButtonProps) => {
         <Link
             to="/auth/sso"
             className={cn(
-                'rounded-4xl border-2 border-white px-10 py-3 hover:cursor-pointer hover:bg-secondary-darken',
+                'inline-flex rounded-4xl border-2 border-white px-10 py-3 hover:cursor-pointer hover:bg-secondary-darken',
                 className,
             )}
         >
