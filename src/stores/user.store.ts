@@ -2,7 +2,8 @@ import { type User } from '@/types';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-interface UserStore extends User {
+interface UserStore {
+    user: User | null;
     setUser: (user: User) => void;
     clearUser: () => void;
 }
@@ -10,12 +11,11 @@ interface UserStore extends User {
 export const useUserStore = create<UserStore>()(
     persist(
         (set) => ({
-            userId: 0,
-            fullName: '',
-            faculty: '',
+            user: null,
 
-            setUser: (user) => set(() => ({ ...user })),
-            clearUser: () => set({ userId: 0, fullName: '', faculty: '' }),
+            setUser: (user) => set({ user }),
+
+            clearUser: () => set({ user: null }),
         }),
         {
             name: 'user-store',
