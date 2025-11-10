@@ -26,8 +26,9 @@ export type Tutor = BaseUser & {
     degree: string;
     bio: string;
     expertise: string;
-    averageRating: string;
+    averageRating: number;
     departmentName: string;
+    officeLocation: string;
     subjects: string[];
 };
 

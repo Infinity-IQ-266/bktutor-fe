@@ -6,6 +6,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 import { Route as _privateRouteRouteImport } from './routes/__private/route';
 import { Route as _privateStudentDashboardIndexRouteImport } from './routes/__private/student/dashboard/index';
+import { Route as _privateStudentFindTutorIndexRouteImport } from './routes/__private/student/find-tutor/index';
 import { Route as _privateTutorDashboardIndexRouteImport } from './routes/__private/tutor/dashboard/index';
 import { Route as rootRouteImport } from './routes/__root';
 import { Route as AuthChangePasswordIndexRouteImport } from './routes/auth/change-password/index';
@@ -31,6 +32,12 @@ const _privateTutorDashboardIndexRoute =
         path: '/tutor/dashboard/',
         getParentRoute: () => _privateRouteRoute,
     } as any);
+const _privateStudentFindTutorIndexRoute =
+    _privateStudentFindTutorIndexRouteImport.update({
+        id: '/student/find-tutor/',
+        path: '/student/find-tutor/',
+        getParentRoute: () => _privateRouteRoute,
+    } as any);
 const _privateStudentDashboardIndexRoute =
     _privateStudentDashboardIndexRouteImport.update({
         id: '/student/dashboard/',
@@ -42,12 +49,14 @@ export interface FileRoutesByFullPath {
     '/': typeof IndexRoute;
     '/auth/change-password': typeof AuthChangePasswordIndexRoute;
     '/student/dashboard': typeof _privateStudentDashboardIndexRoute;
+    '/student/find-tutor': typeof _privateStudentFindTutorIndexRoute;
     '/tutor/dashboard': typeof _privateTutorDashboardIndexRoute;
 }
 export interface FileRoutesByTo {
     '/': typeof IndexRoute;
     '/auth/change-password': typeof AuthChangePasswordIndexRoute;
     '/student/dashboard': typeof _privateStudentDashboardIndexRoute;
+    '/student/find-tutor': typeof _privateStudentFindTutorIndexRoute;
     '/tutor/dashboard': typeof _privateTutorDashboardIndexRoute;
 }
 export interface FileRoutesById {
@@ -56,6 +65,7 @@ export interface FileRoutesById {
     '/__private': typeof _privateRouteRouteWithChildren;
     '/auth/change-password/': typeof AuthChangePasswordIndexRoute;
     '/__private/student/dashboard/': typeof _privateStudentDashboardIndexRoute;
+    '/__private/student/find-tutor/': typeof _privateStudentFindTutorIndexRoute;
     '/__private/tutor/dashboard/': typeof _privateTutorDashboardIndexRoute;
 }
 export interface FileRouteTypes {
@@ -64,12 +74,14 @@ export interface FileRouteTypes {
         | '/'
         | '/auth/change-password'
         | '/student/dashboard'
+        | '/student/find-tutor'
         | '/tutor/dashboard';
     fileRoutesByTo: FileRoutesByTo;
     to:
         | '/'
         | '/auth/change-password'
         | '/student/dashboard'
+        | '/student/find-tutor'
         | '/tutor/dashboard';
     id:
         | '__root__'
@@ -77,6 +89,7 @@ export interface FileRouteTypes {
         | '/__private'
         | '/auth/change-password/'
         | '/__private/student/dashboard/'
+        | '/__private/student/find-tutor/'
         | '/__private/tutor/dashboard/';
     fileRoutesById: FileRoutesById;
 }
@@ -116,6 +129,13 @@ declare module '@tanstack/react-router' {
             preLoaderRoute: typeof _privateTutorDashboardIndexRouteImport;
             parentRoute: typeof _privateRouteRoute;
         };
+        '/__private/student/find-tutor/': {
+            id: '/__private/student/find-tutor/';
+            path: '/student/find-tutor';
+            fullPath: '/student/find-tutor';
+            preLoaderRoute: typeof _privateStudentFindTutorIndexRouteImport;
+            parentRoute: typeof _privateRouteRoute;
+        };
         '/__private/student/dashboard/': {
             id: '/__private/student/dashboard/';
             path: '/student/dashboard';
@@ -128,11 +148,13 @@ declare module '@tanstack/react-router' {
 
 interface _privateRouteRouteChildren {
     _privateStudentDashboardIndexRoute: typeof _privateStudentDashboardIndexRoute;
+    _privateStudentFindTutorIndexRoute: typeof _privateStudentFindTutorIndexRoute;
     _privateTutorDashboardIndexRoute: typeof _privateTutorDashboardIndexRoute;
 }
 
 const _privateRouteRouteChildren: _privateRouteRouteChildren = {
     _privateStudentDashboardIndexRoute: _privateStudentDashboardIndexRoute,
+    _privateStudentFindTutorIndexRoute: _privateStudentFindTutorIndexRoute,
     _privateTutorDashboardIndexRoute: _privateTutorDashboardIndexRoute,
 };
 
