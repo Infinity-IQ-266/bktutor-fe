@@ -16,6 +16,7 @@ import { Route as _privateTutorDashboardIndexRouteImport } from './routes/__priv
 import { Route as _privateStudentProgressIndexRouteImport } from './routes/__private/student/progress/index'
 import { Route as _privateStudentProfileIndexRouteImport } from './routes/__private/student/profile/index'
 import { Route as _privateStudentNotificationsIndexRouteImport } from './routes/__private/student/notifications/index'
+import { Route as _privateStudentMySessionsIndexRouteImport } from './routes/__private/student/my-sessions/index'
 import { Route as _privateStudentMaterialsIndexRouteImport } from './routes/__private/student/materials/index'
 import { Route as _privateStudentFindTutorIndexRouteImport } from './routes/__private/student/find-tutor/index'
 import { Route as _privateStudentDashboardIndexRouteImport } from './routes/__private/student/dashboard/index'
@@ -58,6 +59,12 @@ const _privateStudentNotificationsIndexRoute =
     path: '/student/notifications/',
     getParentRoute: () => _privateRouteRoute,
   } as any)
+const _privateStudentMySessionsIndexRoute =
+  _privateStudentMySessionsIndexRouteImport.update({
+    id: '/student/my-sessions/',
+    path: '/student/my-sessions/',
+    getParentRoute: () => _privateRouteRoute,
+  } as any)
 const _privateStudentMaterialsIndexRoute =
   _privateStudentMaterialsIndexRouteImport.update({
     id: '/student/materials/',
@@ -83,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/student/dashboard': typeof _privateStudentDashboardIndexRoute
   '/student/find-tutor': typeof _privateStudentFindTutorIndexRoute
   '/student/materials': typeof _privateStudentMaterialsIndexRoute
+  '/student/my-sessions': typeof _privateStudentMySessionsIndexRoute
   '/student/notifications': typeof _privateStudentNotificationsIndexRoute
   '/student/profile': typeof _privateStudentProfileIndexRoute
   '/student/progress': typeof _privateStudentProgressIndexRoute
@@ -94,6 +102,7 @@ export interface FileRoutesByTo {
   '/student/dashboard': typeof _privateStudentDashboardIndexRoute
   '/student/find-tutor': typeof _privateStudentFindTutorIndexRoute
   '/student/materials': typeof _privateStudentMaterialsIndexRoute
+  '/student/my-sessions': typeof _privateStudentMySessionsIndexRoute
   '/student/notifications': typeof _privateStudentNotificationsIndexRoute
   '/student/profile': typeof _privateStudentProfileIndexRoute
   '/student/progress': typeof _privateStudentProgressIndexRoute
@@ -107,6 +116,7 @@ export interface FileRoutesById {
   '/__private/student/dashboard/': typeof _privateStudentDashboardIndexRoute
   '/__private/student/find-tutor/': typeof _privateStudentFindTutorIndexRoute
   '/__private/student/materials/': typeof _privateStudentMaterialsIndexRoute
+  '/__private/student/my-sessions/': typeof _privateStudentMySessionsIndexRoute
   '/__private/student/notifications/': typeof _privateStudentNotificationsIndexRoute
   '/__private/student/profile/': typeof _privateStudentProfileIndexRoute
   '/__private/student/progress/': typeof _privateStudentProgressIndexRoute
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
     | '/student/dashboard'
     | '/student/find-tutor'
     | '/student/materials'
+    | '/student/my-sessions'
     | '/student/notifications'
     | '/student/profile'
     | '/student/progress'
@@ -131,6 +142,7 @@ export interface FileRouteTypes {
     | '/student/dashboard'
     | '/student/find-tutor'
     | '/student/materials'
+    | '/student/my-sessions'
     | '/student/notifications'
     | '/student/profile'
     | '/student/progress'
@@ -143,6 +155,7 @@ export interface FileRouteTypes {
     | '/__private/student/dashboard/'
     | '/__private/student/find-tutor/'
     | '/__private/student/materials/'
+    | '/__private/student/my-sessions/'
     | '/__private/student/notifications/'
     | '/__private/student/profile/'
     | '/__private/student/progress/'
@@ -206,6 +219,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof _privateStudentNotificationsIndexRouteImport
       parentRoute: typeof _privateRouteRoute
     }
+    '/__private/student/my-sessions/': {
+      id: '/__private/student/my-sessions/'
+      path: '/student/my-sessions'
+      fullPath: '/student/my-sessions'
+      preLoaderRoute: typeof _privateStudentMySessionsIndexRouteImport
+      parentRoute: typeof _privateRouteRoute
+    }
     '/__private/student/materials/': {
       id: '/__private/student/materials/'
       path: '/student/materials'
@@ -234,6 +254,7 @@ interface _privateRouteRouteChildren {
   _privateStudentDashboardIndexRoute: typeof _privateStudentDashboardIndexRoute
   _privateStudentFindTutorIndexRoute: typeof _privateStudentFindTutorIndexRoute
   _privateStudentMaterialsIndexRoute: typeof _privateStudentMaterialsIndexRoute
+  _privateStudentMySessionsIndexRoute: typeof _privateStudentMySessionsIndexRoute
   _privateStudentNotificationsIndexRoute: typeof _privateStudentNotificationsIndexRoute
   _privateStudentProfileIndexRoute: typeof _privateStudentProfileIndexRoute
   _privateStudentProgressIndexRoute: typeof _privateStudentProgressIndexRoute
@@ -244,6 +265,7 @@ const _privateRouteRouteChildren: _privateRouteRouteChildren = {
   _privateStudentDashboardIndexRoute: _privateStudentDashboardIndexRoute,
   _privateStudentFindTutorIndexRoute: _privateStudentFindTutorIndexRoute,
   _privateStudentMaterialsIndexRoute: _privateStudentMaterialsIndexRoute,
+  _privateStudentMySessionsIndexRoute: _privateStudentMySessionsIndexRoute,
   _privateStudentNotificationsIndexRoute:
     _privateStudentNotificationsIndexRoute,
   _privateStudentProfileIndexRoute: _privateStudentProfileIndexRoute,

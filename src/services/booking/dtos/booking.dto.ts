@@ -1,4 +1,4 @@
-import type { SessionStatusType } from '@/types';
+import type { PagedResponse, Session, SessionStatusType } from '@/types';
 
 export type CreateBookingSessionRequestDto = {
     slotId: number;
@@ -23,3 +23,15 @@ export type CreateBookingSessionResponseDto = {
     tutorId: number;
     tutorName: string;
 };
+
+export type GetMyBookingsRequestDto = {
+    page?: number;
+    size?: number;
+    direction?: 'ASC' | 'DESC';
+    attribute?: string;
+    status?: SessionStatusType;
+    subjectName?: string;
+    bookingType?: 'IN_PERSON' | 'ONLINE';
+};
+
+export type GetMyBookingsResponseDto = PagedResponse & Session[];
