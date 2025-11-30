@@ -61,6 +61,15 @@ function RouteComponent() {
         loadTutors();
     }, []);
 
+    // Debounced search effect with filters
+    useEffect(() => {
+        const timerId = setTimeout(() => {
+            searchTutors();
+        }, 500);
+
+        return () => clearTimeout(timerId);
+    }, [searchQuery, departmentFilter]);
+
     const loadTutors = async () => {
         try {
             setLoading(true);
@@ -73,6 +82,39 @@ function RouteComponent() {
         } catch (error) {
             console.error('Error loading tutors:', error);
             toast.error('Failed to load tutors');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const searchTutors = async () => {
+        try {
+            setLoading(true);
+            const params: {
+                direction: 'DESC' | 'ASC';
+                name?: string;
+                department?: string;
+            } = {
+                direction: 'DESC',
+            };
+
+            // Add name filter if search query exists
+            if (searchQuery.trim()) {
+                params.name = searchQuery.trim();
+            }
+
+            // Add department filter if not 'all'
+            if (departmentFilter !== 'all') {
+                params.department = departmentFilter;
+            }
+
+            const response = await TutorService.getTutors(params);
+            const tutorData = response || [];
+
+            setTutors(tutorData);
+        } catch (error) {
+            console.error('Error searching tutors:', error);
+            toast.error('Failed to search tutors');
         } finally {
             setLoading(false);
         }
