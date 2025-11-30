@@ -1,51 +1,17 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import type { MaterialDto } from '@/services/material';
+import { MaterialService } from '@/services/material';
 import { createFileRoute } from '@tanstack/react-router';
+import dayjs from 'dayjs';
 import { Download, ExternalLink, FileText, Search } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 export const Route = createFileRoute('/__private/student/materials/')({
     component: RouteComponent,
 });
-
-// TODO: Replace with actual API integration using /api/v1/materials/student/me
-const mockMaterials = [
-    {
-        id: 1,
-        title: 'Data Structures - Lecture Notes Week 5',
-        uploadedByName: 'Dr. Nguyen Van A',
-        uploadDate: 'Nov 25, 2025',
-        subject: 'Data Structures',
-        fileType: 'PDF',
-        fileSize: '2.4 MB',
-        downloads: 15,
-        url: '#',
-    },
-    {
-        id: 2,
-        title: 'Binary Search Trees - Implementation Guide',
-        uploadedByName: 'Dr. Nguyen Van A',
-        uploadDate: 'Nov 20, 2025',
-        subject: 'Data Structures',
-        fileType: 'PDF',
-        fileSize: '1.8 MB',
-        downloads: 23,
-        url: '#',
-    },
-    {
-        id: 3,
-        title: 'Calculus II - Integration Techniques',
-        uploadedByName: 'Prof. Tran Thi B',
-        uploadDate: 'Nov 18, 2025',
-        subject: 'Calculus II',
-        fileType: 'PDF',
-        fileSize: '3.2 MB',
-        downloads: 18,
-        url: '#',
-    },
-];
 
 const libraryResources = [
     {
@@ -91,28 +57,59 @@ const libraryResources = [
 ];
 
 function RouteComponent() {
-    const [materials] = useState(mockMaterials);
-    const [loading] = useState(false);
+    const [materials, setMaterials] = useState<MaterialDto[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const handleView = (material: (typeof mockMaterials)[0]) => {
-        // TODO: Implement view functionality with actual material URL
-        toast.info('Opening material...');
-        window.open(material.url, '_blank');
+    useEffect(() => {
+        fetchMaterials();
+    }, []);
+
+    const fetchMaterials = async () => {
+        try {
+            setLoading(true);
+            const data = await MaterialService.getSharedMaterials();
+            setMaterials(data || []);
+        } catch (error) {
+            console.error('Failed to fetch materials:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleDownload = (material: (typeof mockMaterials)[0]) => {
-        // TODO: Implement download using /api/v1/materials/{id}/download
-        toast.success(`Downloading ${material.title}`);
+    const handleDownload = async (material: MaterialDto) => {
+        try {
+            const blob = await MaterialService.downloadMaterial(material.id);
+
+            // Create download link
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${material.title}.${material.fileType}`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+            toast.success(`Downloaded ${material.title}`);
+        } catch (error) {
+            console.error('Failed to download material:', error);
+        }
     };
 
     const handleAccessLibrary = () => {
-        // TODO: Implement library resource access
+        // TODO: Implement library resource access when library API is available
         toast.info('Opening library resource...');
     };
 
     const getIcon = (fileType: string) => {
-        switch (fileType.toUpperCase()) {
+        // Determine icon based on file extension
+        const ext = fileType.toUpperCase();
+        switch (ext) {
             case 'PDF':
+                return FileText;
+            case 'IPYNB':
+                return FileText;
+            case 'CSV':
                 return FileText;
             default:
                 return FileText;
@@ -169,35 +166,32 @@ function RouteComponent() {
                                                     {material.title}
                                                 </h3>
                                                 <p className="mb-2 text-sm text-muted-foreground">
-                                                    Shared by{' '}
-                                                    {material.uploadedByName} •{' '}
-                                                    {material.uploadDate}
+                                                    {dayjs(
+                                                        material.uploadDate,
+                                                    ).format(
+                                                        'MMM D, YYYY',
+                                                    )}{' '}
+                                                    • {material.size}
                                                 </p>
                                                 <div className="flex items-center gap-2">
                                                     <Badge variant="secondary">
-                                                        {material.subject}
+                                                        {material.subjectName}
                                                     </Badge>
-                                                    <span className="text-sm text-muted-foreground">
-                                                        {material.fileSize}
-                                                    </span>
-                                                    <span className="text-sm text-muted-foreground">
-                                                        • {material.downloads}{' '}
-                                                        downloads
-                                                    </span>
+                                                    <Badge variant="outline">
+                                                        {material.fileType.toUpperCase()}
+                                                    </Badge>
+                                                    {material.description && (
+                                                        <span className="text-sm text-muted-foreground">
+                                                            •{' '}
+                                                            {
+                                                                material.description
+                                                            }
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </div>
 
                                             <div className="flex gap-2">
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    onClick={() =>
-                                                        handleView(material)
-                                                    }
-                                                >
-                                                    <ExternalLink className="mr-1 h-4 w-4" />
-                                                    View
-                                                </Button>
                                                 <Button
                                                     size="sm"
                                                     className="bg-primary text-white hover:bg-primary/90"
