@@ -40,4 +40,38 @@ export const TutorService = {
             );
         }
     },
+
+    getMyAvailability: async () => {
+        try {
+            // Note: This endpoint returns an array directly, not wrapped in Response<T>
+            const response = await client.get<Availability[]>(
+                `${url}/me/availability`,
+            );
+
+            return response.data;
+        } catch (error) {
+            console.log(error);
+            toast.error('There is an error while try to get your availability');
+        }
+    },
+
+    updateMyAvailability: async (
+        slots: { startTime: string; endTime: string }[],
+    ) => {
+        try {
+            const response = await client.put<Response<void>>(
+                `${url}/me/availability`,
+                { slots },
+            );
+
+            toast.success('Availability updated successfully');
+            return response.data;
+        } catch (error) {
+            console.log(error);
+            toast.error(
+                'There is an error while try to update your availability',
+            );
+            throw error;
+        }
+    },
 };

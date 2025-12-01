@@ -59,4 +59,32 @@ export const BookingService = {
             toast.error('There is an error while try to cancel booking');
         }
     },
+
+    confirmBooking: async (bookingId: number) => {
+        try {
+            const response = await client.post<Response<void>>(
+                `${url}/${bookingId}/confirm`,
+            );
+
+            toast.success('Booking confirmed successfully');
+            return response.data;
+        } catch (error) {
+            console.log(error);
+            toast.error('There is an error while try to confirm booking');
+        }
+    },
+
+    rejectBooking: async (bookingId: number) => {
+        try {
+            const response = await client.post<Response<void>>(
+                `${url}/${bookingId}/reject`,
+            );
+
+            toast.success('Booking rejected successfully');
+            return response.data;
+        } catch (error) {
+            console.log(error);
+            toast.error('There is an error while try to reject booking');
+        }
+    },
 };

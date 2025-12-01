@@ -15,7 +15,7 @@ export default defineConfig([
             reactHooks.configs['recommended-latest'],
             reactRefresh.configs.vite,
         ],
-        ignores: ['src/components/ui/**', 'src/services/**'],
+        ignores: ['src/components/ui/**', 'src/services/**', 'draft/**'],
         languageOptions: {
             ecmaVersion: 2020,
             globals: globals.browser,
