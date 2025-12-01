@@ -1,0 +1,49 @@
+name: Deploy BKTutor Vite App
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: 'yarn'
+
+            - name: Install dependencies
+              run: yarn install --frozen-lockfile
+
+            - name: Build project
+              run: yarn build
+              env:
+                  VITE_APP_PRODUCTION: ${{ secrets.VITE_APP_PRODUCTION }}
+                  VITE_APP_BE_URL: ${{ secrets.VITE_APP_BE_URL }}
+
+            - name: Copy dist folder to server
+              uses: appleboy/scp-action@v0.1.7
+              with:
+                  host: ${{ secrets.SSH_HOST }}
+                  username: ${{ secrets.SSH_USER }}
+                  key: ${{ secrets.SSH_PRIVATE_KEY }}
+                  source: 'dist/*'
+                  target: '/var/www/bktutor.qzz.io/html/'
+                  strip_components: 1
+
+            - name: Reload Nginx
+              uses: appleboy/ssh-action@v1.0.0
+              with:
+                  host: ${{ secrets.SSH_HOST }}
+                  username: ${{ secrets.SSH_USER }}
+                  key: ${{ secrets.SSH_PRIVATE_KEY }}
+                  script: |
+                      sudo systemctl reload nginx
+                      echo "BKTutor frontend deployed successfully!"
