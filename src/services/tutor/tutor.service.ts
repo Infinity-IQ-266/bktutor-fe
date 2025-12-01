@@ -7,6 +7,7 @@ import type { Response } from '../response';
 import type {
     GetTutorsRequestDto,
     GetTutorsResponseDto,
+    TutorDashboardDto,
 } from './dtos/tutor.dto';
 
 const url = `${BACKEND_URL}/api/v1/tutors`;
@@ -71,6 +72,20 @@ export const TutorService = {
             toast.error(
                 'There is an error while try to update your availability',
             );
+            throw error;
+        }
+    },
+
+    getDashboard: async () => {
+        try {
+            const response = await client.get<Response<TutorDashboardDto>>(
+                `${url}/dashboard`,
+            );
+
+            return response.data.data;
+        } catch (error) {
+            console.log(error);
+            toast.error('Failed to load dashboard data');
             throw error;
         }
     },

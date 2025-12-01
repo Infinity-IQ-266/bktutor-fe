@@ -11,12 +11,13 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import type { MaterialDto } from '@/services/material';
 import { MaterialService } from '@/services/material';
 import { createFileRoute } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 import { Download, FileText, Plus, Share2, Trash2, Upload } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 export const Route = createFileRoute('/__private/tutor/materials/')({
@@ -27,10 +28,19 @@ function RouteComponent() {
     const [materials, setMaterials] = useState<MaterialDto[]>([]);
     const [loading, setLoading] = useState(true);
     const [shareDialogOpen, setShareDialogOpen] = useState(false);
+    const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
     const [selectedMaterial, setSelectedMaterial] =
         useState<MaterialDto | null>(null);
     const [studentIdsInput, setStudentIdsInput] = useState('');
     const [isSharing, setIsSharing] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+
+    // Upload form fields
+    const [uploadTitle, setUploadTitle] = useState('');
+    const [uploadSubject, setUploadSubject] = useState('');
+    const [uploadDescription, setUploadDescription] = useState('');
+    const [uploadFile, setUploadFile] = useState<File | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         fetchMaterials();
@@ -49,8 +59,54 @@ function RouteComponent() {
     };
 
     const handleUploadMaterial = () => {
-        // TODO: Implement upload dialog
-        toast.info('Upload functionality coming soon');
+        // Reset form
+        setUploadTitle('');
+        setUploadSubject('');
+        setUploadDescription('');
+        setUploadFile(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+        setUploadDialogOpen(true);
+    };
+
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setUploadFile(file);
+        }
+    };
+
+    const handleUploadConfirm = async () => {
+        if (!uploadTitle.trim()) {
+            toast.error('Please enter a title');
+            return;
+        }
+        if (!uploadSubject.trim()) {
+            toast.error('Please enter a subject');
+            return;
+        }
+        if (!uploadFile) {
+            toast.error('Please select a file');
+            return;
+        }
+
+        try {
+            setIsUploading(true);
+            await MaterialService.uploadMaterial({
+                title: uploadTitle,
+                subject: uploadSubject,
+                description: uploadDescription || undefined,
+                file: uploadFile,
+            });
+
+            setUploadDialogOpen(false);
+            await fetchMaterials(); // Refresh materials list
+        } catch (error) {
+            console.error('Failed to upload material:', error);
+        } finally {
+            setIsUploading(false);
+        }
     };
 
     const handleShareMaterial = (materialId: number) => {
@@ -405,6 +461,97 @@ function RouteComponent() {
                     )}
                 </TabsContent>
             </Tabs>
+
+            {/* Upload Material Dialog */}
+            <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Upload Material</DialogTitle>
+                        <DialogDescription>
+                            Upload a new learning material for your students
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="upload-title">
+                                Title <span className="text-red-500">*</span>
+                            </Label>
+                            <Input
+                                id="upload-title"
+                                placeholder="e.g., Data Structures Lecture Notes"
+                                value={uploadTitle}
+                                onChange={(e) => setUploadTitle(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="upload-subject">
+                                Subject <span className="text-red-500">*</span>
+                            </Label>
+                            <Input
+                                id="upload-subject"
+                                placeholder="e.g., Data Structures and Algorithms"
+                                value={uploadSubject}
+                                onChange={(e) =>
+                                    setUploadSubject(e.target.value)
+                                }
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="upload-description">
+                                Description (Optional)
+                            </Label>
+                            <Textarea
+                                id="upload-description"
+                                placeholder="Brief description of the material..."
+                                value={uploadDescription}
+                                onChange={(e) =>
+                                    setUploadDescription(e.target.value)
+                                }
+                                className="min-h-[80px]"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="upload-file">
+                                File <span className="text-red-500">*</span>
+                            </Label>
+                            <Input
+                                id="upload-file"
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileSelect}
+                                accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.ipynb,.csv"
+                            />
+                            {uploadFile && (
+                                <p className="text-sm text-muted-foreground">
+                                    Selected: {uploadFile.name} (
+                                    {(uploadFile.size / 1024 / 1024).toFixed(2)}{' '}
+                                    MB)
+                                </p>
+                            )}
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => setUploadDialogOpen(false)}
+                            disabled={isUploading}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleUploadConfirm}
+                            disabled={isUploading}
+                        >
+                            {isUploading ? 'Uploading...' : 'Upload Material'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             {/* Share Material Dialog */}
             <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>

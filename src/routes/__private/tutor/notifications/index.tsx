@@ -3,15 +3,13 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { createFileRoute } from '@tanstack/react-router';
 import {
+    AlertCircle,
     Bell,
     Calendar,
-    Check,
     CheckCheck,
-    Clock,
     MessageSquare,
     Star,
-    User,
-    X,
+    Trash2,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -201,7 +199,7 @@ function RouteComponent() {
                 <div>
                     <h1 className="mb-2 text-foreground">Notifications</h1>
                     <p className="text-muted-foreground">
-                        Stay updated with your tutoring activities
+                        Manage your session requests and student interactions
                     </p>
                 </div>
                 <Button
@@ -214,48 +212,46 @@ function RouteComponent() {
                 </Button>
             </div>
 
-            {/* Stats */}
-            <div className="mb-6 grid grid-cols-3 gap-6">
-                <div className="rounded-xl border border-border bg-white p-6">
-                    <div className="flex items-center gap-4">
+            {/* Stats Cards */}
+            <div className="mb-6 grid grid-cols-3 gap-4">
+                <div className="rounded-xl border border-border bg-white p-4">
+                    <div className="flex items-center gap-3">
                         <div className="rounded-lg bg-blue-50 p-3">
-                            <Bell className="h-6 w-6 text-blue-600" />
+                            <Bell className="h-5 w-5 text-blue-600" />
                         </div>
                         <div>
                             <p className="text-sm text-muted-foreground">
                                 Total
                             </p>
-                            <p className="text-2xl font-bold text-foreground">
+                            <p className="text-foreground">
                                 {notifications.length}
                             </p>
                         </div>
                     </div>
                 </div>
-                <div className="rounded-xl border border-border bg-white p-6">
-                    <div className="flex items-center gap-4">
+                <div className="rounded-xl border border-border bg-white p-4">
+                    <div className="flex items-center gap-3">
                         <div className="rounded-lg bg-orange-50 p-3">
-                            <Clock className="h-6 w-6 text-orange-600" />
+                            <AlertCircle className="h-5 w-5 text-orange-600" />
                         </div>
                         <div>
                             <p className="text-sm text-muted-foreground">
                                 Unread
                             </p>
-                            <p className="text-2xl font-bold text-foreground">
-                                {unreadCount}
-                            </p>
+                            <p className="text-foreground">{unreadCount}</p>
                         </div>
                     </div>
                 </div>
-                <div className="rounded-xl border border-border bg-white p-6">
-                    <div className="flex items-center gap-4">
+                <div className="rounded-xl border border-border bg-white p-4">
+                    <div className="flex items-center gap-3">
                         <div className="rounded-lg bg-red-50 p-3">
-                            <User className="h-6 w-6 text-red-600" />
+                            <Calendar className="h-5 w-5 text-red-600" />
                         </div>
                         <div>
                             <p className="text-sm text-muted-foreground">
                                 Action Required
                             </p>
-                            <p className="text-2xl font-bold text-foreground">
+                            <p className="text-foreground">
                                 {actionRequiredCount}
                             </p>
                         </div>
@@ -266,78 +262,78 @@ function RouteComponent() {
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList>
-                    <TabsTrigger value="all">All</TabsTrigger>
+                    <TabsTrigger value="all">
+                        All ({notifications.length})
+                    </TabsTrigger>
                     <TabsTrigger value="unread">
-                        Unread
-                        {unreadCount > 0 && (
-                            <Badge className="ml-2 bg-blue-500 text-white">
-                                {unreadCount}
-                            </Badge>
-                        )}
+                        Unread ({unreadCount})
                     </TabsTrigger>
                     <TabsTrigger value="action-required">
-                        Action Required
-                        {actionRequiredCount > 0 && (
-                            <Badge className="ml-2 bg-red-500 text-white">
-                                {actionRequiredCount}
-                            </Badge>
-                        )}
+                        Action Required ({actionRequiredCount})
                     </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value={activeTab} className="mt-6">
                     <div className="space-y-4">
                         {filteredNotifications.length === 0 ? (
-                            <div className="rounded-xl border border-border bg-white p-12 text-center">
-                                <Bell className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+                            <div className="py-8 text-center">
+                                <Bell className="mx-auto mb-3 h-12 w-12 text-muted-foreground opacity-50" />
                                 <p className="text-muted-foreground">
-                                    No notifications in this category
+                                    No notifications
                                 </p>
                             </div>
                         ) : (
                             filteredNotifications.map((notif) => {
                                 const Icon = getNotificationIcon(notif.type);
+                                const iconColor = getIconBgColor(notif.type);
+
                                 return (
                                     <div
                                         key={notif.id}
-                                        className={`rounded-xl border p-6 transition-colors ${
+                                        className={`rounded-xl border border-border bg-white p-5 transition-shadow hover:shadow-md ${
                                             notif.status === 'unread'
-                                                ? 'border-blue-200 bg-blue-50'
-                                                : 'border-border bg-white'
+                                                ? 'border-l-4 border-l-primary'
+                                                : ''
                                         }`}
                                     >
                                         <div className="flex items-start gap-4">
                                             <div
-                                                className={`rounded-lg p-3 ${getIconBgColor(notif.type)}`}
+                                                className={`rounded-lg p-3 ${iconColor}`}
                                             >
-                                                <Icon className="h-6 w-6" />
+                                                <Icon className="h-5 w-5" />
                                             </div>
+
                                             <div className="flex-1">
-                                                <div className="mb-2 flex items-start justify-between">
-                                                    <div>
-                                                        <h4 className="mb-1 text-foreground">
-                                                            {notif.title}
-                                                        </h4>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {notif.message}
-                                                        </p>
-                                                    </div>
+                                                <div className="mb-1 flex items-start justify-between">
+                                                    <h3 className="text-foreground">
+                                                        {notif.title}
+                                                    </h3>
+                                                    <span className="ml-4 text-xs whitespace-nowrap text-muted-foreground">
+                                                        {notif.time}
+                                                    </span>
+                                                </div>
+
+                                                <p className="mb-3 text-sm text-muted-foreground">
+                                                    {notif.message}
+                                                </p>
+
+                                                <div className="flex items-center gap-2">
                                                     {notif.status ===
                                                         'unread' && (
-                                                        <Badge className="bg-blue-500 text-white">
+                                                        <Badge
+                                                            variant="secondary"
+                                                            className="bg-primary/10 text-primary"
+                                                        >
                                                             New
                                                         </Badge>
                                                     )}
-                                                </div>
-                                                <div className="flex items-center gap-3">
-                                                    <span className="text-xs text-muted-foreground">
-                                                        {notif.time}
-                                                    </span>
+
                                                     {notif.actionRequired &&
                                                         notif.bookingId && (
                                                             <div className="flex gap-2">
                                                                 <Button
                                                                     size="sm"
+                                                                    className="bg-green-600 text-white hover:bg-green-700"
                                                                     onClick={() =>
                                                                         handleAcceptBooking(
                                                                             notif.bookingId!,
@@ -345,12 +341,12 @@ function RouteComponent() {
                                                                         )
                                                                     }
                                                                 >
-                                                                    <Check className="mr-1 h-4 w-4" />
                                                                     Accept
                                                                 </Button>
                                                                 <Button
                                                                     size="sm"
                                                                     variant="outline"
+                                                                    className="text-red-600 hover:text-red-700"
                                                                     onClick={() =>
                                                                         handleDeclineBooking(
                                                                             notif.bookingId!,
@@ -358,28 +354,41 @@ function RouteComponent() {
                                                                         )
                                                                     }
                                                                 >
-                                                                    <X className="mr-1 h-4 w-4" />
                                                                     Decline
                                                                 </Button>
                                                             </div>
                                                         )}
-                                                    {notif.status ===
-                                                        'unread' &&
-                                                        !notif.actionRequired && (
-                                                            <Button
-                                                                size="sm"
-                                                                variant="ghost"
-                                                                onClick={() =>
-                                                                    handleMarkAsRead(
-                                                                        notif.id,
-                                                                    )
-                                                                }
-                                                            >
-                                                                <Check className="mr-1 h-4 w-4" />
-                                                                Mark as Read
-                                                            </Button>
-                                                        )}
                                                 </div>
+                                            </div>
+
+                                            <div className="flex gap-2">
+                                                {notif.status === 'unread' && (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        onClick={() =>
+                                                            handleMarkAsRead(
+                                                                notif.id,
+                                                            )
+                                                        }
+                                                    >
+                                                        <CheckCheck className="h-4 w-4" />
+                                                    </Button>
+                                                )}
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    className="text-red-600 hover:text-red-700"
+                                                    onClick={() => {
+                                                        // TODO: Delete notification
+                                                        console.log(
+                                                            'Delete notification:',
+                                                            notif.id,
+                                                        );
+                                                    }}
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
                                             </div>
                                         </div>
                                     </div>
