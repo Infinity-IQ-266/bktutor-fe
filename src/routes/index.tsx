@@ -132,12 +132,12 @@ function RouteComponent() {
                                     htmlFor="email"
                                     className="mb-[4px] block font-['Arimo',sans-serif] text-[14px] leading-[14px] font-normal text-[#2d3748]"
                                 >
-                                    Email Address
+                                    Username (BK@NetId)
                                 </label>
                                 <input
                                     id="email"
                                     type="text"
-                                    placeholder="yourname@hcmut.edu.vn"
+                                    placeholder="Enter your username"
                                     value={username}
                                     onChange={(e) =>
                                         setUsername(e.target.value)

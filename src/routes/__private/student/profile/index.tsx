@@ -68,7 +68,11 @@ function RouteComponent() {
                             <Label htmlFor="studentid">Student ID</Label>
                             <Input
                                 id="studentid"
-                                defaultValue={user?.username || 'N/A'}
+                                defaultValue={
+                                    (user?.role === 'STUDENT' &&
+                                        user?.studentId) ||
+                                    'N/A'
+                                }
                                 disabled
                                 className="mt-1 bg-gray-50"
                             />

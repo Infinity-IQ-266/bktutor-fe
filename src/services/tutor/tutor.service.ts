@@ -89,4 +89,34 @@ export const TutorService = {
             throw error;
         }
     },
+
+    getMyStudents: async (params?: { page?: number; size?: number }) => {
+        try {
+            const response = await client.get<Response<any>>(
+                `${url}/me/students`,
+                { params },
+            );
+
+            return response.data;
+        } catch (error) {
+            console.log(error);
+            toast.error('Failed to load students');
+            throw error;
+        }
+    },
+
+    getMyFeedbacks: async (params?: { page?: number; size?: number }) => {
+        try {
+            const response = await client.get<Response<any>>(
+                `${url}/me/feedbacks`,
+                { params },
+            );
+
+            return response.data;
+        } catch (error) {
+            console.log(error);
+            toast.error('Failed to load feedbacks');
+            throw error;
+        }
+    },
 };

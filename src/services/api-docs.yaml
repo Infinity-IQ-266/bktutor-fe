@@ -389,6 +389,72 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Response"
+  /api/v1/tutors/me/students:
+    get:
+      tags:
+      - tutor-controller
+      operationId: getMyStudents
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Response"
+  /api/v1/tutors/me/feedbacks:
+    get:
+      tags:
+      - tutor-controller
+      operationId: getMyFeedbacks
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Response"
+  /api/v1/tutors/dashboard:
+    get:
+      tags:
+      - tutor-controller
+      operationId: getTutorDashboard
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Response"
   /api/v1/students/dashboard:
     get:
       tags:
@@ -605,9 +671,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TimeSlot"
-          minItems: 1
-      required:
-      - slots
     PagedResult:
       type: object
       properties:

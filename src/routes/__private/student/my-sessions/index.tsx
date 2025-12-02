@@ -4,10 +4,13 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import { BookingService } from '@/services/booking';
 import type { Session } from '@/types';
 import { createFileRoute } from '@tanstack/react-router';
@@ -27,6 +30,9 @@ function RouteComponent() {
         null,
     );
     const [showDetailDialog, setShowDetailDialog] = useState(false);
+    const [showRateDialog, setShowRateDialog] = useState(false);
+    const [rating, setRating] = useState(0);
+    const [feedback, setFeedback] = useState('');
 
     useEffect(() => {
         loadSessions();
@@ -61,6 +67,38 @@ function RouteComponent() {
     const handleViewDetails = (session: Session) => {
         setSelectedSession(session);
         setShowDetailDialog(true);
+    };
+
+    const handleRate = (session: Session) => {
+        setSelectedSession(session);
+        setRating(0);
+        setFeedback('');
+        setShowRateDialog(true);
+    };
+
+    const submitRating = async () => {
+        if (rating === 0) {
+            toast.error('Please select a rating');
+            return;
+        }
+
+        if (!selectedSession) return;
+
+        try {
+            // TODO: Integrate with feedback API when available
+            // await FeedbackService.createFeedback({
+            //     sessionId: selectedSession.id,
+            //     rating,
+            //     comment: feedback,
+            // });
+
+            toast.success('Thank you for your feedback!');
+            setShowRateDialog(false);
+            loadSessions();
+        } catch (error) {
+            console.error('Error submitting rating:', error);
+            toast.error('Failed to submit rating');
+        }
     };
 
     const getStatusColor = (status: string) => {
@@ -262,6 +300,8 @@ function RouteComponent() {
                                     key={session.id}
                                     session={session}
                                     showActions={false}
+                                    showRating={session.status === 'COMPLETED'}
+                                    onRate={handleRate}
                                     onViewDetails={handleViewDetails}
                                     getStatusColor={getStatusColor}
                                 />
@@ -357,6 +397,87 @@ function RouteComponent() {
                     )}
                 </DialogContent>
             </Dialog>
+
+            {/* Rate Session Dialog */}
+            <Dialog open={showRateDialog} onOpenChange={setShowRateDialog}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Rate Session</DialogTitle>
+                        <DialogDescription>
+                            Share your feedback about this tutoring session
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {selectedSession && (
+                        <div className="space-y-4">
+                            <div className="rounded-lg bg-gray-50 p-3">
+                                <p className="font-medium text-foreground">
+                                    {selectedSession.subject}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                    {selectedSession.tutorName} •{' '}
+                                    {dayjs(selectedSession.startTime).format(
+                                        'MMM D, YYYY',
+                                    )}
+                                </p>
+                            </div>
+
+                            <div>
+                                <Label className="mb-2 block">
+                                    Overall Rating *
+                                </Label>
+                                <div className="flex gap-2">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <button
+                                            key={star}
+                                            type="button"
+                                            onClick={() => setRating(star)}
+                                            className="transition-transform hover:scale-110"
+                                        >
+                                            <Star
+                                                className={`h-8 w-8 ${
+                                                    star <= rating
+                                                        ? 'fill-yellow-500 text-yellow-500'
+                                                        : 'text-gray-300'
+                                                }`}
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div>
+                                <Label htmlFor="feedback">Your Feedback</Label>
+                                <Textarea
+                                    id="feedback"
+                                    placeholder="What did you think about this session?"
+                                    className="mt-1 min-h-[100px]"
+                                    value={feedback}
+                                    onChange={(e) =>
+                                        setFeedback(e.target.value)
+                                    }
+                                />
+                            </div>
+
+                            <DialogFooter>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setShowRateDialog(false)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    onClick={submitRating}
+                                    disabled={rating === 0}
+                                    className="bg-primary text-white hover:bg-primary/90"
+                                >
+                                    Submit Rating
+                                </Button>
+                            </DialogFooter>
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
@@ -364,7 +485,9 @@ function RouteComponent() {
 interface SessionCardProps {
     session: Session;
     showActions: boolean;
+    showRating?: boolean;
     onCancel?: (id: number) => void;
+    onRate?: (session: Session) => void;
     onViewDetails: (session: Session) => void;
     getStatusColor: (status: string) => string;
 }
@@ -372,7 +495,9 @@ interface SessionCardProps {
 function SessionCard({
     session,
     showActions,
+    showRating = false,
     onCancel,
+    onRate,
     onViewDetails,
     getStatusColor,
 }: SessionCardProps) {
@@ -432,17 +557,6 @@ function SessionCard({
                             <Eye className="mr-1 h-4 w-4" />
                             View Details
                         </Button>
-                        {showActions && session.status === 'CONFIRMED' && (
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                                onClick={() => onCancel?.(session.id)}
-                            >
-                                <X className="mr-1 h-4 w-4" />
-                                Cancel
-                            </Button>
-                        )}
                         {showActions && session.status === 'PENDING' && (
                             <Button
                                 size="sm"
@@ -452,6 +566,16 @@ function SessionCard({
                             >
                                 <X className="mr-1 h-4 w-4" />
                                 Cancel Request
+                            </Button>
+                        )}
+                        {showRating && (
+                            <Button
+                                size="sm"
+                                className="bg-primary text-white hover:bg-primary/90"
+                                onClick={() => onRate?.(session)}
+                            >
+                                <Star className="mr-1 h-4 w-4" />
+                                Rate Session
                             </Button>
                         )}
                     </div>

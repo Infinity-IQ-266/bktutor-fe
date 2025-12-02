@@ -76,13 +76,13 @@ export const Sidebar = () => {
                         id: 'tutor',
                         label: 'Tutors',
                         icon: 'GraduationCap',
-                        to: `${routePrefix}/tutor`,
+                        to: `${routePrefix}/tutors`,
                     },
                     {
                         id: 'student',
                         label: 'Students',
                         icon: 'Users',
-                        to: `${routePrefix}/student`,
+                        to: `${routePrefix}/students`,
                     },
                     {
                         id: 'sessions',

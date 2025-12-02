@@ -46,6 +46,20 @@ function RouteComponent() {
     const [availabilityFilter, setAvailabilityFilter] = useState('all');
     const [ratingFilter, setRatingFilter] = useState('all');
 
+    // Check if any filters are active
+    const hasActiveFilters =
+        departmentFilter !== 'all' ||
+        availabilityFilter !== 'all' ||
+        ratingFilter !== 'all';
+
+    // Reset all filters
+    const resetFilters = () => {
+        setDepartmentFilter('all');
+        setAvailabilityFilter('all');
+        setRatingFilter('all');
+        setShowFilters(false);
+    };
+
     // Booking form state
     const [availableSlotsOfSelectedTutor, setAvailableSlotsOfSelectedTutor] =
         useState<string[]>();
@@ -252,7 +266,7 @@ function RouteComponent() {
                         <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
                             type="text"
-                            placeholder="Search by subject, expertise, or tutor name (e.g., Nguyen Minh A)..."
+                            placeholder="Search by tutor's name (e.g., Nguyen Minh A)..."
                             className="pl-10"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -260,10 +274,23 @@ function RouteComponent() {
                     </div>
                     <Button
                         variant="outline"
-                        onClick={() => setShowFilters(!showFilters)}
+                        className={
+                            hasActiveFilters
+                                ? 'text-red-600 hover:border-red-600! hover:bg-red-600! hover:text-white!'
+                                : ''
+                        }
+                        onClick={() => {
+                            if (hasActiveFilters) {
+                                resetFilters();
+                            } else {
+                                setShowFilters(!showFilters);
+                            }
+                        }}
                     >
-                        <Filter className="mr-2 h-4 w-4" />
-                        Filters
+                        {!hasActiveFilters && (
+                            <Filter className="mr-2 h-4 w-4" />
+                        )}
+                        {hasActiveFilters ? 'Reset Filters' : 'Filters'}
                     </Button>
                 </div>
 
