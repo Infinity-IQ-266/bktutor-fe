@@ -18,11 +18,29 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import { TutorService } from '@/services/tutor';
 import { createFileRoute } from '@tanstack/react-router';
 import { Calendar, FileText, Search, TrendingUp, User } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import type { PastStudent, Student } from './-types';
+
+interface StudentApiResponse {
+    id: number;
+    fullName?: string;
+    studentId?: string;
+    email?: string;
+    phone?: string;
+    departmentName?: string;
+    faculty?: string;
+    academicYear?: number;
+    subjects?: string[];
+    totalSessions?: number;
+    lastSession?: string;
+    progress?: string;
+    status?: string;
+    notes?: Array<{ date: string; note: string }>;
+}
 
 export const Route = createFileRoute('/__private/tutor/my-students/')({
     component: RouteComponent,
@@ -118,8 +136,10 @@ const mockPastStudents: PastStudent[] = [
 
 function RouteComponent() {
     const [searchQuery, setSearchQuery] = useState('');
-    const [activeStudents] = useState<Student[]>(mockActiveStudents);
+    const [activeStudents, setActiveStudents] = useState<Student[]>([]);
     const [pastStudents] = useState<PastStudent[]>(mockPastStudents);
+    const [loading, setLoading] = useState(true);
+    const [page] = useState(0);
     const [showAddNoteDialog, setShowAddNoteDialog] = useState(false);
     const [showScheduleDialog, setShowScheduleDialog] = useState(false);
     const [showStudentDetailDialog, setShowStudentDetailDialog] =
@@ -130,6 +150,51 @@ function RouteComponent() {
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(
         new Date(),
     );
+
+    const loadStudents = useCallback(async () => {
+        try {
+            setLoading(true);
+            const response = await TutorService.getMyStudents({
+                page,
+                size: 50,
+            });
+
+            if (response?.data) {
+                // Map API response to Student type
+                const students: Student[] = response.data.map(
+                    (student: StudentApiResponse) => ({
+                        id: student.id,
+                        name: student.fullName || 'Unknown',
+                        studentId:
+                            student.studentId || student.id?.toString() || '',
+                        email: student.email || '',
+                        phone: student.phone || '',
+                        faculty:
+                            student.departmentName || student.faculty || '',
+                        year: student.academicYear?.toString() || '',
+                        subjects: student.subjects || [],
+                        totalSessions: student.totalSessions || 0,
+                        attendanceRate: '100%', // TODO: Add to API if available
+                        lastSession: student.lastSession || 'N/A',
+                        progress: student.progress || '',
+                        status: student.status || 'Active',
+                        notes: student.notes || [],
+                    }),
+                );
+                setActiveStudents(students);
+            }
+        } catch (error) {
+            console.error('Error loading students:', error);
+            // Fallback to mock data on error
+            setActiveStudents(mockActiveStudents);
+        } finally {
+            setLoading(false);
+        }
+    }, [page]);
+
+    useEffect(() => {
+        loadStudents();
+    }, [loadStudents]);
 
     const filteredActiveStudents = activeStudents.filter(
         (student) =>
@@ -332,11 +397,28 @@ function RouteComponent() {
                 </TabsList>
 
                 <TabsContent value="active" className="mt-6">
-                    <div className="space-y-4">
-                        {filteredActiveStudents.map((student) => (
-                            <StudentCard key={student.id} student={student} />
-                        ))}
-                    </div>
+                    {loading ? (
+                        <div className="py-12 text-center">
+                            <p className="text-muted-foreground">
+                                Loading students...
+                            </p>
+                        </div>
+                    ) : filteredActiveStudents.length === 0 ? (
+                        <div className="py-12 text-center">
+                            <p className="text-muted-foreground">
+                                No active students found
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {filteredActiveStudents.map((student) => (
+                                <StudentCard
+                                    key={student.id}
+                                    student={student}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </TabsContent>
 
                 <TabsContent value="past" className="mt-6">
